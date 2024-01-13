@@ -1,0 +1,6 @@
+*.git/
+*.idea/
+*tmp/
+*vendor/
+*csv
+server

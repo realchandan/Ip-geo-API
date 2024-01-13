@@ -1,0 +1,35 @@
+name: Build and push image
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USERNAME }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Build, tag, and push image to GHCR
+        env:
+          NAME: ip-geo-api
+          IMAGE_TAG: ${{ github.sha }}
+          USERNAME: ${{ secrets.GH_USERNAME }}
+        run: |
+          docker build -t $NAME .
+          docker tag $NAME ghcr.io/$USERNAME/$NAME
+          docker push ghcr.io/$USERNAME/$NAME
+          docker tag $NAME ghcr.io/$USERNAME/$NAME:$IMAGE_TAG
+          docker push ghcr.io/$USERNAME/$NAME:$IMAGE_TAG
